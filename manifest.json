@@ -4,8 +4,8 @@
   "description": "간편한 4대보험 계산기",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#2563eb",
+  "background_color": "#f5f6f8",
+  "theme_color": "#f5f6f8",
   "orientation": "portrait",
   "icons": [
     {

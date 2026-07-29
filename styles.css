@@ -5,47 +5,69 @@
     box-sizing: border-box;
 }
 
+:root {
+    --accent: #1a6dff;
+    --accent-dark: #0052e0;
+    --accent-tint: #eef4ff;
+    --text: #17181c;
+    --text-sub: #7a7d85;
+    --line: #eceef1;
+    --bg: #f5f6f8;
+}
+
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic", sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Malgun Gothic", sans-serif;
+    background:
+        radial-gradient(circle at 12% 15%, rgba(140, 190, 255, 0.55), transparent 42%),
+        radial-gradient(circle at 88% 12%, rgba(255, 190, 230, 0.45), transparent 42%),
+        radial-gradient(circle at 50% 95%, rgba(160, 255, 210, 0.4), transparent 48%),
+        #eef1f5;
+    background-attachment: fixed;
     min-height: 100vh;
-    padding: 20px;
-    color: #333;
+    padding: 24px 16px;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
 }
 
 /* 헤더 */
 header {
     text-align: center;
-    color: white;
-    margin-bottom: 30px;
+    margin-bottom: 24px;
 }
 
 .logo-container h1 {
-    font-size: 28px;
+    font-size: 20px;
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
+    color: var(--text);
 }
 
 .company-name {
-    font-size: 16px;
-    opacity: 0.95;
+    font-size: 13px;
+    color: var(--text-sub);
 }
 
-/* 카드 */
+/* 카드 — 글래스(유리) 효과: 뒤 배경의 색이 흐릿하게 비쳐 보임 */
 .card {
-    background: white;
-    border-radius: 20px;
-    padding: 30px 25px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    max-width: 500px;
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1.5px solid rgba(255, 255, 255, 0.7);
+    border-radius: 24px;
+    padding: 28px 22px;
+    box-shadow:
+        0 8px 32px rgba(31, 38, 135, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    max-width: 460px;
     margin: 0 auto;
 }
 
 .card h2 {
-    font-size: 22px;
-    margin-bottom: 25px;
-    color: #2563eb;
-    text-align: center;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 22px;
+    color: var(--text);
+    text-align: left;
 }
 
 /* 입력 그룹 */
@@ -56,27 +78,32 @@ header {
 
 .input-group label {
     display: block;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
     margin-bottom: 10px;
-    color: #555;
+    color: var(--text-sub);
 }
 
 .input-group input,
 .input-group select {
     width: 100%;
     padding: 16px;
-    font-size: 18px;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
-    transition: all 0.3s;
+    font-size: 22px;
+    font-weight: 700;
+    font-family: inherit;
+    background: var(--bg);
+    border: 1.5px solid transparent;
+    border-radius: 14px;
+    transition: all 0.15s;
+    color: var(--text);
 }
 
 .input-group input:focus,
 .input-group select:focus {
     outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    background: white;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-tint);
 }
 
 .input-group .unit {
@@ -84,7 +111,8 @@ header {
     right: 20px;
     top: 50px;
     font-size: 16px;
-    color: #999;
+    font-weight: 600;
+    color: var(--text-sub);
     pointer-events: none;
 }
 
@@ -100,16 +128,16 @@ header {
     display: flex;
     align-items: center;
     padding: 16px;
-    border: 2px solid #e5e7eb;
-    border-radius: 12px;
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.15s;
     background: white;
 }
 
 .radio-label:has(input:checked) {
-    border-color: #2563eb;
-    background: #eff6ff;
+    border-color: var(--accent);
+    background: var(--accent-tint);
 }
 
 .radio-label input[type="radio"] {
@@ -117,47 +145,46 @@ header {
     height: 20px;
     margin-right: 10px;
     cursor: pointer;
+    accent-color: var(--accent);
 }
 
 .radio-text {
     font-size: 16px;
     font-weight: 600;
-    color: #333;
+    color: var(--text);
 }
 
-/* 배너 공통 스타일 */
+/* 배너 공통 스타일 — 그라데이션 대신 옅은 색 배경 위에 진한 텍스트 */
 .durunuri-banner,
 .warning-banner {
-    border-radius: 12px;
+    border-radius: 16px;
     padding: 20px;
     margin-bottom: 25px;
 }
 
-/* 두루누리 배너 (파란색) */
+/* 두루누리 배너 */
 .durunuri-banner {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    background: var(--accent-tint);
 }
 
-/* 경고 배너 (주황색) */
+/* 경고 배너 */
 .warning-banner {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+    background: #fff6e9;
 }
 
 .banner-button-warning {
-    background: white;
-    color: #d97706;
+    background: #b45309;
+    color: white;
 }
 
 .banner-button-warning.applied {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: 2px solid white;
+    background: #fde9c8;
+    color: #b45309;
+    border: none;
 }
 
 .banner-icon {
-    font-size: 32px;
+    font-size: 28px;
     margin-bottom: 10px;
 }
 
@@ -166,15 +193,22 @@ header {
 }
 
 .banner-title {
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 700;
-    color: white;
+    color: var(--text);
     margin-bottom: 6px;
+}
+
+.durunuri-banner .banner-desc {
+    color: var(--accent-dark);
+}
+
+.warning-banner .banner-desc {
+    color: #b45309;
 }
 
 .banner-desc {
     font-size: 13px;
-    color: rgba(255, 255, 255, 0.9);
     line-height: 1.5;
 }
 
@@ -185,15 +219,15 @@ header {
 
 .banner-button {
     flex: 1;
-    background: white;
-    color: #2563eb;
+    background: var(--accent);
+    color: white;
     border: none;
     padding: 12px 16px;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.15s;
 }
 
 .banner-button:active {
@@ -202,18 +236,18 @@ header {
 
 .banner-button-outline {
     background: transparent;
-    color: white;
-    border: 2px solid white;
+    color: var(--accent-dark);
+    border: 1.5px solid var(--accent);
 }
 
 .banner-button-outline:active {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--accent-tint);
 }
 
 .banner-button.applied {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: 2px solid white;
+    background: #dbe7ff;
+    color: var(--accent-dark);
+    border: none;
 }
 
 /* 버튼 */
@@ -222,74 +256,77 @@ header {
 .btn-option {
     width: 100%;
     padding: 18px;
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 17px;
+    font-weight: 700;
+    font-family: inherit;
     border: none;
-    border-radius: 12px;
+    border-radius: 14px;
     cursor: pointer;
     transition: all 0.3s;
     margin-top: 10px;
 }
 
 .btn-primary {
-    background: #2563eb;
+    background: var(--accent);
     color: white;
 }
 
 .btn-primary:active {
-    background: #1d4ed8;
+    background: var(--accent-dark);
     transform: scale(0.98);
 }
 
 .btn-secondary {
-    background: #f3f4f6;
-    color: #666;
+    background: var(--bg);
+    color: var(--text-sub);
 }
 
 .btn-secondary:active {
-    background: #e5e7eb;
+    background: var(--line);
     transform: scale(0.98);
 }
 
 .btn-option {
     background: white;
-    border: 2px solid #e5e7eb;
-    padding: 25px;
+    border: 1.5px solid var(--line);
+    padding: 22px;
     text-align: left;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
+    border-radius: 16px;
 }
 
 .btn-option:active {
-    background: #f9fafb;
-    border-color: #2563eb;
+    background: var(--accent-tint);
+    border-color: var(--accent);
     transform: scale(0.98);
 }
 
 .option-title {
-    font-size: 20px;
+    font-size: 17px;
     font-weight: 700;
-    color: #2563eb;
-    margin-bottom: 5px;
+    color: var(--text);
+    margin-bottom: 4px;
 }
 
 .option-desc {
-    font-size: 14px;
-    color: #999;
+    font-size: 13px;
+    color: var(--text-sub);
 }
 
 /* 결과 화면 */
 .result-summary {
-    background: #f9fafb;
+    background: var(--bg);
     padding: 20px;
-    border-radius: 12px;
+    border-radius: 14px;
     margin-bottom: 25px;
 }
 
 .salary-info {
     display: flex;
     justify-content: space-between;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
+    color: var(--text-sub);
 }
 
 .result-table {
@@ -299,19 +336,20 @@ header {
 .result-row {
     display: flex;
     justify-content: space-between;
-    padding: 16px 0;
-    border-bottom: 1px solid #f3f4f6;
-    font-size: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 15px;
+    color: var(--text-sub);
 }
 
 .result-row.total {
-    border-top: 2px solid #2563eb;
+    border-top: none;
     border-bottom: none;
-    font-size: 20px;
-    font-weight: 700;
-    color: #2563eb;
-    padding-top: 20px;
-    margin-top: 10px;
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--text);
+    padding-top: 18px;
+    margin-top: 6px;
 }
 
 .button-group {
@@ -352,7 +390,7 @@ header {
 }
 
 .expert-entry a {
-    color: rgba(255, 255, 255, 0.85);
+    color: var(--text-sub);
     font-size: 14px;
     text-decoration: underline;
 }
@@ -360,7 +398,7 @@ header {
 /* 결과 화면 준비 중 안내 문구 */
 .placeholder-text {
     text-align: center;
-    color: #999;
+    color: var(--text-sub);
     line-height: 1.6;
     margin: 20px 0;
 }
@@ -368,19 +406,18 @@ header {
 /* 푸터 */
 footer {
     text-align: center;
-    color: white;
-    margin-top: 30px;
-    font-size: 14px;
+    color: var(--text-sub);
+    margin-top: 28px;
+    font-size: 13px;
 }
 
 footer p {
-    margin: 5px 0;
-    opacity: 0.9;
+    margin: 4px 0;
 }
 
 .note {
     font-size: 12px;
-    opacity: 0.8;
+    opacity: 0.7;
 }
 
 /* 모바일 최적화 */
@@ -394,11 +431,11 @@ footer p {
     }
 
     .logo-container h1 {
-        font-size: 24px;
+        font-size: 19px;
     }
 
     .card h2 {
-        font-size: 20px;
+        font-size: 19px;
     }
 
     .btn-primary,
