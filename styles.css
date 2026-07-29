@@ -345,6 +345,26 @@ header {
     }
 }
 
+/* 전문가용 진입 링크 */
+.expert-entry {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.expert-entry a {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+    text-decoration: underline;
+}
+
+/* 결과 화면 준비 중 안내 문구 */
+.placeholder-text {
+    text-align: center;
+    color: #999;
+    line-height: 1.6;
+    margin: 20px 0;
+}
+
 /* 푸터 */
 footer {
     text-align: center;
