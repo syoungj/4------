@@ -9,6 +9,12 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- 움직이는 배경 원 (블러 처리된 색 얼룩) -->
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
     <!-- 로고 및 헤더 -->
     <header>
         <div class="logo-container">
@@ -54,12 +60,77 @@
         </div>
     </div>
 
-    <!-- 3단계: 결과 화면 (다음 단계에서 개발 예정) -->
+    <!-- 2.5단계: 생년월일 입력 (근로자 경로 전용) -->
+    <div id="stepBirth" class="step">
+        <div class="card">
+            <h2>생년월일을 알려주세요</h2>
+            <p class="privacy-note">🔒 입력하신 생년월일은 계산에만 사용되고 저장되거나 기록되지 않습니다.</p>
+
+            <div class="input-group">
+                <label for="birthdate">생년월일 (8자리)</label>
+                <input type="text" id="birthdate" inputmode="numeric" placeholder="예: 19900101" maxlength="8">
+            </div>
+
+            <button class="btn-primary" onclick="goToResultFromBirth()">다음</button>
+            <button class="btn-secondary" onclick="goToStep2()">이전</button>
+        </div>
+    </div>
+
+    <!-- 3단계: 결과 화면 -->
     <div id="step3" class="step">
         <div class="card">
-            <h2>결과 화면 준비 중</h2>
-            <p class="placeholder-text">여기에 실수령액 · 사업주 총 부담액과<br>두루누리 · 일부가입 토글이 들어갈 예정입니다.</p>
-            <button class="btn-secondary" onclick="goToStep2()">이전</button>
+            <h2 id="resultTitle">근로자 부담금</h2>
+
+            <div class="result-summary">
+                <div class="salary-info">
+                    <span>월급여액</span>
+                    <span id="displaySalary">0원</span>
+                </div>
+            </div>
+
+            <div class="result-row total">
+                <span>실수령액</span>
+                <span id="resultNetPay">0원</span>
+            </div>
+
+            <div class="result-table">
+                <div class="result-row">
+                    <span>국민연금</span>
+                    <span id="resultPension">0원</span>
+                </div>
+                <div class="result-row">
+                    <span>건강보험</span>
+                    <span id="resultHealth">0원</span>
+                </div>
+                <div class="result-row">
+                    <span>장기요양보험</span>
+                    <span id="resultLongterm">0원</span>
+                </div>
+                <div class="result-row">
+                    <span>고용보험</span>
+                    <span id="resultEmployment">0원</span>
+                </div>
+                <div class="result-row">
+                    <span>공제 합계</span>
+                    <span id="resultTotal">0원</span>
+                </div>
+            </div>
+
+            <p id="ageNotice" class="privacy-note" style="display:none;"></p>
+
+            <!-- 두루누리 지원 토글 -->
+            <div id="durunuriBanner" class="durunuri-banner" style="display:none;">
+                <div class="banner-icon">🎁</div>
+                <div class="banner-content">
+                    <div class="banner-title">두루누리 사회보험료 지원 대상이에요</div>
+                    <div class="banner-desc">월급여 270만원 이하면 보험료를 최대 80%까지 지원받을 수 있어요.</div>
+                </div>
+                <div class="banner-buttons">
+                    <button id="durunuriToggleBtn" class="banner-button" onclick="toggleDurunuri()">지원받으면 얼마?</button>
+                </div>
+            </div>
+
+            <button class="btn-secondary" onclick="restart()">처음부터 다시</button>
         </div>
     </div>
 

@@ -13,20 +13,64 @@
     --text-sub: #7a7d85;
     --line: #eceef1;
     --bg: #f5f6f8;
+    --success: #12875a;
+}
+
+/* 두루누리 지원 적용으로 바뀐 금액 강조 */
+.value-changed {
+    color: var(--success) !important;
+    font-weight: 700;
 }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard", "Malgun Gothic", sans-serif;
-    background:
-        radial-gradient(circle at 12% 15%, rgba(140, 190, 255, 0.55), transparent 42%),
-        radial-gradient(circle at 88% 12%, rgba(255, 190, 230, 0.45), transparent 42%),
-        radial-gradient(circle at 50% 95%, rgba(160, 255, 210, 0.4), transparent 48%),
-        #eef1f5;
-    background-attachment: fixed;
+    background: #f0f2f5;
     min-height: 100vh;
     padding: 24px 16px;
     color: var(--text);
     -webkit-font-smoothing: antialiased;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* 움직이는 배경 원 (Figma Make에서 만든 참조 디자인 이식) */
+.bg-blobs {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.blob {
+    position: absolute;
+    border-radius: 50%;
+}
+
+.blob-1 {
+    width: 80vw;
+    height: 80vw;
+    bottom: -10%;
+    left: -15%;
+    background: radial-gradient(circle, rgba(80, 210, 180, 0.45) 0%, transparent 65%);
+    animation: floatLight 10s ease-in-out infinite;
+}
+
+.blob-2 {
+    width: 70vw;
+    height: 70vw;
+    top: -10%;
+    right: -10%;
+    background: radial-gradient(circle, rgba(80, 120, 240, 0.38) 0%, transparent 65%);
+    animation: floatLight 14s ease-in-out infinite reverse;
+}
+
+@keyframes floatLight {
+    0%   { transform: translate(0%, 0%); }
+    25%  { transform: translate(18%, -12%); }
+    50%  { transform: translate(-10%, 20%); }
+    75%  { transform: translate(-20%, -8%); }
+    100% { transform: translate(0%, 0%); }
 }
 
 /* 헤더 */
@@ -49,9 +93,9 @@ header {
 
 /* 카드 — 글래스(유리) 효과: 뒤 배경의 색이 흐릿하게 비쳐 보임 */
 .card {
-    background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(28px) saturate(180%);
-    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    background: rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(20px) saturate(200%);
+    -webkit-backdrop-filter: blur(20px) saturate(200%);
     border: 1.5px solid rgba(255, 255, 255, 0.7);
     border-radius: 24px;
     padding: 28px 22px;
@@ -68,6 +112,17 @@ header {
     margin-bottom: 22px;
     color: var(--text);
     text-align: left;
+}
+
+/* 개인정보 비저장 안내 */
+.privacy-note {
+    font-size: 12.5px;
+    color: var(--text-sub);
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin: -12px 0 20px;
+    line-height: 1.5;
 }
 
 /* 입력 그룹 */
@@ -91,8 +146,10 @@ header {
     font-size: 22px;
     font-weight: 700;
     font-family: inherit;
-    background: var(--bg);
-    border: 1.5px solid transparent;
+    background: rgba(26, 109, 255, 0.1);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border: 1.5px solid rgba(255, 255, 255, 0.5);
     border-radius: 14px;
     transition: all 0.15s;
     color: var(--text);
@@ -101,9 +158,15 @@ header {
 .input-group input:focus,
 .input-group select:focus {
     outline: none;
-    background: white;
+    background: rgba(26, 109, 255, 0.16);
     border-color: var(--accent);
     box-shadow: 0 0 0 4px var(--accent-tint);
+}
+
+.input-group input::placeholder {
+    color: var(--text-sub);
+    font-weight: 500;
+    opacity: 0.6;
 }
 
 .input-group .unit {
@@ -267,28 +330,40 @@ header {
 }
 
 .btn-primary {
-    background: var(--accent);
+    padding: 14px;
+    font-size: 15px;
+    background: linear-gradient(135deg, #7db2ff 0%, var(--accent) 45%, #002f8c 100%);
     color: white;
+    box-shadow: 0 4px 16px rgba(26, 109, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .btn-primary:active {
-    background: var(--accent-dark);
+    background: linear-gradient(135deg, var(--accent) 0%, #002f8c 100%);
+    box-shadow: 0 2px 8px rgba(26, 109, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
     transform: scale(0.98);
 }
 
 .btn-secondary {
-    background: var(--bg);
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    border-radius: 14px;
+    box-shadow: none;
     color: var(--text-sub);
+    text-decoration: underline;
+    font-weight: 600;
 }
 
 .btn-secondary:active {
-    background: var(--line);
+    background: rgba(255, 255, 255, 0.18);
+    color: var(--text);
     transform: scale(0.98);
 }
 
 .btn-option {
-    background: white;
-    border: 1.5px solid var(--line);
+    background: rgba(255, 255, 255, 0.18);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border: 1.5px solid rgba(255, 255, 255, 0.5);
     padding: 22px;
     text-align: left;
     margin-bottom: 12px;
@@ -296,7 +371,7 @@ header {
 }
 
 .btn-option:active {
-    background: var(--accent-tint);
+    background: rgba(26, 109, 255, 0.18);
     border-color: var(--accent);
     transform: scale(0.98);
 }
