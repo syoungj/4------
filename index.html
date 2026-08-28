@@ -33,7 +33,23 @@
                 <span class="unit">원</span>
             </div>
 
-            <button class="btn-primary" onclick="goToStep2()">다음</button>
+            <button class="btn-primary" onclick="goToBirthStep()">다음</button>
+        </div>
+    </div>
+
+    <!-- 1.5단계: 생년월 입력 (근로자·사업주 계산 둘 다 나이 정보가 필요해서 미리 한 번만 물어봄) -->
+    <div id="stepBirth" class="step">
+        <div class="card">
+            <h2>태어난 년월을 알려주세요</h2>
+            <p class="privacy-note">🔒 입력하신 생년월은 계산에만 사용되고 저장되거나 기록되지 않습니다.</p>
+
+            <div class="input-group">
+                <label for="birthdate">태어난 년월 (6자리)</label>
+                <input type="text" id="birthdate" inputmode="numeric" placeholder="예: 199001" maxlength="6" autocomplete="new-password">
+            </div>
+
+            <button class="btn-primary" onclick="confirmBirth()">다음</button>
+            <button class="btn-secondary" onclick="goToStep1()">이전</button>
         </div>
     </div>
 
@@ -51,18 +67,8 @@
 
                 <div class="option-expand" id="workerExpand">
                     <div class="option-expand-inner">
-                        <!-- 생년월일 입력 -->
-                        <div id="workerBirthSection">
-                            <p class="privacy-note">🔒 입력하신 생년월일은 계산에만 사용되고 저장되거나 기록되지 않습니다.</p>
-                            <div class="input-group">
-                                <label for="birthdate">생년월일 (8자리)</label>
-                                <input type="text" id="birthdate" inputmode="numeric" placeholder="예: 19900101" maxlength="8" autocomplete="new-password">
-                            </div>
-                            <button class="btn-primary" onclick="confirmWorkerBirth()">확인</button>
-                        </div>
-
                         <!-- 근로자 결과 -->
-                        <div id="workerResultSection" style="display:none;">
+                        <div id="workerResultSection">
                             <h3 id="resultTitle">내 월급에서 얼마 떼나요?</h3>
 
                             <div class="result-summary">
@@ -79,22 +85,22 @@
 
                             <div class="result-table">
                                 <div class="result-row">
-                                    <span>국민연금</span>
+                                    <span>국민연금<span id="resultPensionRate" class="rate-tag"></span></span>
                                     <span id="resultPension">0원</span>
                                 </div>
                                 <div class="result-row">
-                                    <span>건강보험</span>
+                                    <span>건강보험<span id="resultHealthRate" class="rate-tag"></span></span>
                                     <span id="resultHealth">0원</span>
                                 </div>
                                 <div class="result-row">
-                                    <span>장기요양보험</span>
+                                    <span>장기요양보험<span id="resultLongtermRate" class="rate-tag"></span></span>
                                     <span id="resultLongterm">0원</span>
                                 </div>
                                 <div class="result-row">
-                                    <span>고용보험</span>
+                                    <span>고용보험<span id="resultEmploymentRate" class="rate-tag"></span></span>
                                     <span id="resultEmployment">0원</span>
                                 </div>
-                                <div class="result-row">
+                                <div class="result-row subtotal">
                                     <span>공제 합계</span>
                                     <span id="resultTotal">0원</span>
                                 </div>
@@ -104,10 +110,12 @@
 
                             <!-- 두루누리 지원 토글 -->
                             <div id="durunuriBanner" class="durunuri-banner" style="display:none;">
-                                <div class="banner-icon">🎁</div>
                                 <div class="banner-content">
-                                    <div class="banner-title">두루누리 사회보험료 지원 대상이에요</div>
-                                    <div class="banner-desc">월급여 270만원 이하면 보험료를 최대 80%까지 지원받을 수 있어요.</div>
+                                    <div class="banner-title">
+                                        두루누리 사회보험료 지원 대상이에요
+                                        <a href="https://insurancesupport.or.kr/durunuri/intro.php" target="_blank" rel="noopener noreferrer" class="banner-info-link" aria-label="두루누리 사회보험료 지원사업 자세히 보기 (새 창)">ⓘ</a>
+                                    </div>
+                                    <div class="banner-desc">월급여 270만원 이하면 보험료의 80%를 지원받을 수 있어요.</div>
                                 </div>
                                 <div class="banner-buttons">
                                     <button id="durunuriToggleBtn" class="banner-button" onclick="toggleDurunuri()">지원받으면 얼마?</button>
@@ -136,38 +144,49 @@
                             </div>
                         </div>
 
+                        <div class="input-group">
+                            <label for="industryType">업종을 선택해주세요 (산재보험료 계산용)</label>
+                            <select id="industryType" onchange="calculateEmployerResult()"></select>
+                        </div>
+
                         <div class="result-row total">
-                            <span>4대보험료 총 부담액</span>
+                            <span>사업주 부담 보험료</span>
                             <span id="employerTotal">0원</span>
                         </div>
 
                         <div class="result-table">
                             <div class="result-row">
-                                <span>국민연금</span>
+                                <span>국민연금<span id="employerPensionRate" class="rate-tag"></span></span>
                                 <span id="employerPension">0원</span>
                             </div>
                             <div class="result-row">
-                                <span>건강보험</span>
+                                <span>건강보험<span id="employerHealthRate" class="rate-tag"></span></span>
                                 <span id="employerHealth">0원</span>
                             </div>
                             <div class="result-row">
-                                <span>장기요양보험</span>
+                                <span>장기요양보험<span id="employerLongtermRate" class="rate-tag"></span></span>
                                 <span id="employerLongterm">0원</span>
                             </div>
                             <div class="result-row">
-                                <span>고용보험</span>
+                                <span>고용보험<span id="employerEmploymentRate" class="rate-tag"></span></span>
                                 <span id="employerEmployment">0원</span>
+                            </div>
+                            <div class="result-row">
+                                <span>산재보험<span id="employerAccidentRate" class="rate-tag"></span></span>
+                                <span id="employerAccident">업종을 선택해주세요</span>
                             </div>
                         </div>
 
-                        <p class="privacy-note">ℹ️ 근로자·사업주 부담분을 합산한 금액이며, 산재보험료는 업종마다 요율이 달라 이 계산에는 포함되지 않았어요. 정확한 산재보험료는 별도로 확인해주세요.</p>
+                        <p id="employerAgeNotice" class="privacy-note" style="display:none;"></p>
+
+                        <p class="privacy-note">ℹ️ 이 직원을 고용해서 사업주가 실제로 부담하는 몫만 보여드려요 (근로자 본인 부담분은 제외). 산재보험료는 선택하신 업종 기준 요율로 계산한 참고용 금액이에요 — 근로복지공단이 실제 사업 내용을 보고 다른 업종으로 분류할 수 있어 정확하지 않을 수 있으니, 정확한 산재보험료율은 근로복지공단에 별도로 확인해주세요.</p>
 
                         <button class="btn-secondary" onclick="restart()">처음부터 다시</button>
                     </div>
                 </div>
             </div>
 
-            <button class="btn-secondary" onclick="goToStep1()">이전</button>
+            <button class="btn-secondary" onclick="goToBirthStepBack()">이전</button>
         </div>
 
         <div class="expert-entry">

@@ -193,6 +193,13 @@ header {
     color: var(--text);
 }
 
+/* 업종 선택 드롭다운 — 급여 입력칸만큼 크게 강조할 필요 없어서 다른 보험료 항목과 비슷한 크기로 */
+.input-group select {
+    padding: 14px 16px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
 /* 스핀 버튼(화살표) 뒤에 뜨는 흰색 배경 제거 */
 .input-group input[type="number"]::-webkit-inner-spin-button,
 .input-group input[type="number"]::-webkit-outer-spin-button {
@@ -302,6 +309,23 @@ header {
     font-weight: 700;
     color: var(--text);
     margin-bottom: 6px;
+}
+
+/* 배너 제목 옆 "자세히 보기" 링크 아이콘 */
+.banner-info-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin-left: 4px;
+    border-radius: 50%;
+    background: rgba(26, 109, 255, 0.15);
+    color: var(--accent-dark);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    vertical-align: middle;
 }
 
 .durunuri-banner .banner-desc {
@@ -423,10 +447,6 @@ header {
     margin-bottom: 12px;
 }
 
-.option-block.collapsed {
-    display: none;
-}
-
 .option-block .btn-option {
     margin-bottom: 0;
 }
@@ -498,6 +518,15 @@ header {
     color: var(--text-sub);
 }
 
+/* 보험료 항목 이름 옆에 붙는 요율 표시 (예: "국민연금 4.75%") */
+.rate-tag {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-sub);
+    opacity: 0.75;
+    margin-left: 4px;
+}
+
 .result-row.total {
     border-top: none;
     border-bottom: none;
@@ -506,6 +535,17 @@ header {
     color: var(--text);
     padding-top: 18px;
     margin-top: 6px;
+}
+
+/* 공제 합계 — 위 개별 항목들과 헷갈리지 않게 색과 굵기를 다르게 강조 */
+.result-row.subtotal {
+    border-top: 1.5px solid var(--line);
+    border-bottom: none;
+    margin-top: 4px;
+    padding-top: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent-dark);
 }
 
 .button-group {
