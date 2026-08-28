@@ -1,9 +1,12 @@
 // 2026년 보험료율 (고용보험은 2025년 요율)
 const RATES = {
-    pension: 0.095,          // 국민연금 9.5% (근로자·사업주 각 4.75%)
-    health: 0.0719,          // 건강보험 7.19% (근로자·사업주 각 3.595%)
-    longterm: 0.1314,        // 장기요양보험 — 건강보험료의 13.14%
-    employmentWorker: 0.009, // 고용보험(실업급여) 근로자 부담 0.9%
+    pension: 0.095,            // 국민연금 9.5% (근로자·사업주 각 4.75%)
+    health: 0.0719,            // 건강보험 7.19% (근로자·사업주 각 3.595%)
+    longterm: 0.1314,          // 장기요양보험 — 건강보험료의 13.14%
+    employmentWorker: 0.009,   // 고용보험(실업급여) 근로자 부담 0.9%
+    // 고용보험 사업주 부담: 실업급여(0.9%, 근로자와 동일) + 고용안정·직업능력개발사업(150인 미만 기업 기준 0.25%)
+    // 이 사업은 기업 규모별로 요율이 다르므로(150인 이상은 더 높음), 여기선 가장 흔한 소규모 사업장 기준 값을 씀
+    employmentEmployer: 0.0115,
 };
 
 // 두루누리 사회보험료 지원 상한액 (2026년 기준)
@@ -18,6 +21,7 @@ let calculationType = '';
 let birthDate = null;
 let age = 0;
 let calc = {};           // 마지막으로 계산된 결과 (두루누리 토글 시 재사용)
+let employerCalc = {};   // 사업주 경로 계산 결과
 let durunuriApplied = false;
 
 function showStep(id) {
@@ -38,22 +42,68 @@ function goToStep2() {
         return;
     }
     salary = value;
+    resetStep2Accordion();
     showStep('step2');
 }
 
-// 딱 하나 선택 (근로자 / 사업주)
-function selectPath(type) {
+// 2단계 아코디언 상태 초기화 (둘 다 접힌 상태로)
+function resetStep2Accordion() {
+    document.getElementById('workerExpand').classList.remove('open');
+    document.getElementById('employerExpand').classList.remove('open');
+    document.getElementById('workerOptionBtn').classList.remove('active');
+    document.getElementById('employerOptionBtn').classList.remove('active');
+    document.getElementById('workerBlock').classList.remove('collapsed');
+    document.getElementById('employerBlock').classList.remove('collapsed');
+    document.getElementById('workerBirthSection').style.display = 'block';
+    document.getElementById('workerResultSection').style.display = 'none';
+}
+
+// 선택 버튼을 누르면 그 자리에서 펼치기/접기 (다른 쪽은 숨김)
+function toggleOption(type) {
+    const workerBlock = document.getElementById('workerBlock');
+    const employerBlock = document.getElementById('employerBlock');
+    const workerExpand = document.getElementById('workerExpand');
+    const employerExpand = document.getElementById('employerExpand');
+    const workerBtn = document.getElementById('workerOptionBtn');
+    const employerBtn = document.getElementById('employerOptionBtn');
+
     calculationType = type;
+
     if (type === 'worker') {
-        // 근로자 경로는 국민연금(60세)·고용보험 실업급여(65세) 대상 여부를
-        // 판단하기 위해 생년월일을 먼저 물어본다.
-        // "저장되지 않는다"는 안내와 실제 동작이 다르게 보이지 않도록,
-        // 이 화면에 들어올 때마다 입력창을 매번 비운다.
+        if (workerExpand.classList.contains('open')) {
+            // 다시 누르면 접기
+            workerExpand.classList.remove('open');
+            workerBtn.classList.remove('active');
+            employerBlock.classList.remove('collapsed');
+            return;
+        }
+        workerExpand.classList.add('open');
+        workerBtn.classList.add('active');
+        employerExpand.classList.remove('open');
+        employerBtn.classList.remove('active');
+        employerBlock.classList.add('collapsed');
+
+        // "저장되지 않는다"는 안내와 실제 동작이 다르게 보이지 않도록 매번 입력창을 비운다
         document.getElementById('birthdate').value = '';
-        showStep('stepBirth');
+        document.getElementById('workerBirthSection').style.display = 'block';
+        document.getElementById('workerResultSection').style.display = 'none';
+        setTimeout(() => workerBlock.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
     } else {
+        if (employerExpand.classList.contains('open')) {
+            employerExpand.classList.remove('open');
+            employerBtn.classList.remove('active');
+            workerBlock.classList.remove('collapsed');
+            return;
+        }
+        employerExpand.classList.add('open');
+        employerBtn.classList.add('active');
+        workerExpand.classList.remove('open');
+        workerBtn.classList.remove('active');
+        workerBlock.classList.add('collapsed');
+
         // 사업주 경로는 아직 나이 입력을 받지 않음 (추후 직원별로 확장 예정)
-        showStep('step3');
+        calculateEmployerResult();
+        setTimeout(() => employerBlock.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
     }
 }
 
@@ -89,8 +139,8 @@ function parseBirthdate(raw) {
     return parsed;
 }
 
-// 생년월일 입력 후 결과 화면으로 이동
-function goToResultFromBirth() {
+// 생년월일 확인 후 같은 자리에서 결과를 펼쳐 보여줌
+function confirmWorkerBirth() {
     const raw = document.getElementById('birthdate').value.trim();
     const parsed = parseBirthdate(raw);
     if (!parsed) {
@@ -100,7 +150,11 @@ function goToResultFromBirth() {
     birthDate = parsed;
     age = calculateKoreanAge(birthDate);
     calculateWorkerResult();
-    showStep('step3');
+
+    document.getElementById('workerBirthSection').style.display = 'none';
+    const resultSection = document.getElementById('workerResultSection');
+    resultSection.style.display = 'block';
+    setTimeout(() => resultSection.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
 }
 
 // 근로자 부담금 계산 (60세 이상 국민연금 제외, 65세 이상 고용보험 실업급여 제외)
@@ -126,7 +180,7 @@ function calculateWorkerResult() {
 
 // 계산 결과를 화면에 반영
 function renderResult() {
-    document.getElementById('resultTitle').textContent = '근로자 부담금';
+    document.getElementById('resultTitle').textContent = '내 월급에서 얼마 떼나요?';
     document.getElementById('displaySalary').textContent = formatNumber(salary) + '원';
     document.getElementById('resultPension').textContent = formatNumber(calc.pension) + '원';
     document.getElementById('resultHealth').textContent = formatNumber(calc.health) + '원';
@@ -155,6 +209,39 @@ function renderResult() {
     durunuriBtn.textContent = '지원받으면 얼마?';
     durunuriBtn.classList.remove('applied');
     document.getElementById('durunuriBanner').style.display = salary <= 2700000 ? 'block' : 'none';
+}
+
+// 사업주 부담금 계산 (근로자 부담분 + 사업주 부담분 합산 — 산재보험은 업종별로 달라 제외)
+// 아직 나이를 입력받지 않으므로 60세·65세 면제는 반영하지 않음 (전문가용에서 보완 예정)
+function calculateEmployerResult() {
+    const pensionBase = Math.floor(salary / 1000) * 1000;
+    const pensionHalf = Math.floor((pensionBase * RATES.pension / 2) / 10) * 10;
+    const pensionTotal = pensionHalf * 2;
+
+    const healthHalf = Math.floor((salary * RATES.health / 2) / 10) * 10;
+    const healthTotal = healthHalf * 2;
+
+    const longtermHalf = Math.floor((healthHalf * RATES.longterm) / 10) * 10;
+    const longtermTotal = longtermHalf * 2;
+
+    const employmentWorkerAmt = Math.floor((salary * RATES.employmentWorker) / 10) * 10;
+    const employmentEmployerAmt = Math.floor((salary * RATES.employmentEmployer) / 10) * 10;
+    const employmentTotal = employmentWorkerAmt + employmentEmployerAmt;
+
+    const total = pensionTotal + healthTotal + longtermTotal + employmentTotal;
+
+    employerCalc = { pensionTotal, healthTotal, longtermTotal, employmentTotal, total };
+    renderEmployerResult();
+}
+
+// 사업주 계산 결과를 화면에 반영
+function renderEmployerResult() {
+    document.getElementById('employerDisplaySalary').textContent = formatNumber(salary) + '원';
+    document.getElementById('employerPension').textContent = formatNumber(employerCalc.pensionTotal) + '원';
+    document.getElementById('employerHealth').textContent = formatNumber(employerCalc.healthTotal) + '원';
+    document.getElementById('employerLongterm').textContent = formatNumber(employerCalc.longtermTotal) + '원';
+    document.getElementById('employerEmployment').textContent = formatNumber(employerCalc.employmentTotal) + '원';
+    document.getElementById('employerTotal').textContent = formatNumber(employerCalc.total) + '원';
 }
 
 // 두루누리 지원 적용 시 본인 부담액 (80% 지원, 상한액 있으면 상한액만큼만 지원)
@@ -208,6 +295,7 @@ function toggleDurunuri() {
 function restart() {
     document.getElementById('salary').value = '';
     document.getElementById('birthdate').value = '';
+    resetStep2Accordion();
     goToStep1();
 }
 
