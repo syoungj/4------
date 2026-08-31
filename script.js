@@ -55,6 +55,7 @@ let birthDate = null;
 let calc = {};           // 마지막으로 계산된 결과 (두루누리 토글 시 재사용)
 let employerCalc = {};   // 사업주 경로 계산 결과
 let durunuriApplied = false;
+let durunuriEmployerApplied = false;
 
 function showStep(id) {
     document.querySelectorAll('.step').forEach(step => step.classList.remove('active'));
@@ -231,7 +232,7 @@ function renderResult() {
     // 항목 옆 요율 표시 (면제된 항목은 요율 대신 "면제"로 표시)
     document.getElementById('resultPensionRate').textContent = calc.pensionExempt ? '(면제)' : formatRate(RATES.pension / 2 * 100);
     document.getElementById('resultHealthRate').textContent = formatRate(RATES.health / 2 * 100);
-    document.getElementById('resultLongtermRate').textContent = `(건강보험료의 ${RATES.longterm * 100}%)`;
+    document.getElementById('resultLongtermRate').textContent = `(건강보험료 × ${roundRate(RATES.longterm * 100)}%)`;
     document.getElementById('resultEmploymentRate').textContent = calc.employmentExempt ? '(면제)' : formatRate(RATES.employmentWorker * 100);
 
     // 나이 관련 예외는 실제로 해당될 때만 안내
@@ -311,6 +312,7 @@ function calculateEmployerResult() {
         pensionExempt, employmentExempt, pensionExemptNextMonth, employmentExemptNextMonth,
         employmentEmployerRate, accidentPermille
     };
+    durunuriEmployerApplied = false;
     renderEmployerResult();
 }
 
@@ -328,7 +330,7 @@ function renderEmployerResult() {
     // 항목 옆 요율 표시 (면제된 항목은 요율 대신 "면제"로 표시)
     document.getElementById('employerPensionRate').textContent = employerCalc.pensionExempt ? '(면제)' : formatRate(RATES.pension / 2 * 100);
     document.getElementById('employerHealthRate').textContent = formatRate(RATES.health / 2 * 100);
-    document.getElementById('employerLongtermRate').textContent = `(건강보험료의 ${RATES.longterm * 100}%)`;
+    document.getElementById('employerLongtermRate').textContent = `(건강보험료 × ${roundRate(RATES.longterm * 100)}%)`;
     document.getElementById('employerEmploymentRate').textContent = formatRate(employerCalc.employmentEmployerRate * 100);
     document.getElementById('employerAccidentRate').textContent =
         employerCalc.accidentPermille === null ? '' : formatRate(employerCalc.accidentPermille / 10);
@@ -346,6 +348,12 @@ function renderEmployerResult() {
     } else {
         employerAgeNotice.style.display = 'none';
     }
+
+    // 두루누리 배너: 월급여 270만원 이하일 때만 표시
+    const durunuriEmployerBtn = document.getElementById('durunuriEmployerToggleBtn');
+    durunuriEmployerBtn.textContent = '지원받으면 얼마?';
+    durunuriEmployerBtn.classList.remove('applied');
+    document.getElementById('durunuriEmployerBanner').style.display = salary <= 2700000 ? 'block' : 'none';
 }
 
 // 두루누리 지원 적용 시 본인 부담액 (80% 지원, 상한액 있으면 상한액만큼만 지원)
@@ -395,6 +403,40 @@ function toggleDurunuri() {
     });
 }
 
+// 두루누리 지원 토글 (사업주 몫 — 국민연금·고용보험 사업주 부담분도 지원 대상)
+function toggleDurunuriEmployer() {
+    durunuriEmployerApplied = !durunuriEmployerApplied;
+    const btn = document.getElementById('durunuriEmployerToggleBtn');
+
+    let pension = employerCalc.pensionEmployer;
+    let employment = employerCalc.employmentEmployer;
+
+    if (durunuriEmployerApplied) {
+        if (!employerCalc.pensionExempt) {
+            pension = durunuriSupportedAmount(employerCalc.pensionEmployer, DURUNURI_CAPS.pension);
+        }
+        employment = durunuriSupportedAmount(employerCalc.employmentEmployer, DURUNURI_CAPS.employmentWorker);
+        btn.textContent = '원래 금액 보기';
+        btn.classList.add('applied');
+    } else {
+        pension = employerCalc.pensionEmployer;
+        employment = employerCalc.employmentEmployer;
+        btn.textContent = '지원받으면 얼마?';
+        btn.classList.remove('applied');
+    }
+
+    const total = pension + employerCalc.healthEmployer + employerCalc.longtermEmployer + employment + (employerCalc.accidentEmployer || 0);
+    document.getElementById('employerPension').textContent = formatNumber(pension) + '원';
+    document.getElementById('employerEmployment').textContent = formatNumber(employment) + '원';
+    document.getElementById('employerTotal').textContent = formatNumber(total) + '원';
+
+    // 두루누리 적용으로 바뀐 금액은 색을 다르게 해서 눈에 띄게 한다
+    const changedIds = ['employerPension', 'employerEmployment', 'employerTotal'];
+    changedIds.forEach(id => {
+        document.getElementById(id).classList.toggle('value-changed', durunuriEmployerApplied);
+    });
+}
+
 // 처음부터 다시
 function restart() {
     document.getElementById('salary').value = '';
@@ -409,16 +451,24 @@ function formatNumber(num) {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
-// 요율을 "(4.75%)" 형식 문자열로 변환 (소수점 불필요한 0은 자동으로 안 붙음)
-// 건강보험료율(3.595%)처럼 소수점 3자리까지 있는 실제 공식 요율과 다르게
-// 반올림되어 보이지 않도록 소수점 3자리까지 허용함
+// 퍼센트 숫자를 소수점 3자리까지 깔끔하게 반올림 (0.1314*100 같은 계산에서
+// 생기는 13.139999999999999 같은 부동소수점 오차를 없애기 위함)
+function roundRate(percentValue) {
+    return Math.round(percentValue * 1000) / 1000;
+}
+
+// 요율을 "(4.75%)" 형식 문자열로 변환
 function formatRate(percentValue) {
-    return `(${Math.round(percentValue * 1000) / 1000}%)`;
+    return `(${roundRate(percentValue)}%)`;
 }
 
 // 전문가용 진입 (추후 개발)
 function goToExpert() {
     alert('전문가용 화면은 준비 중입니다.');
+}
+
+function goToMultiWorker() {
+    showStep('stepMultiWorker');
 }
 
 // 산재보험 업종 드롭다운은 페이지 로드 시 한 번만 채워두면 됨
