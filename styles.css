@@ -165,6 +165,16 @@ header {
     line-height: 1.5;
 }
 
+/* "계산하기" 버튼 다음에 오는 안내문구는 위로 당기지 말고 간격을 둠 (사이에 숨겨진 결과 영역이 끼어 있어도 적용되도록 ~ 사용) */
+.btn-primary ~ .privacy-note {
+    margin-top: 16px;
+}
+
+/* 근로자별 목록 다음에 오는 안내문구도 위로 당기지 말고 간격을 둠 */
+.mw-result-list + .privacy-note {
+    margin-top: 16px;
+}
+
 /* 입력 그룹 */
 .input-group {
     margin-bottom: 25px;
@@ -195,9 +205,12 @@ header {
 
 /* 업종 선택 드롭다운 — 급여 입력칸만큼 크게 강조할 필요 없어서 다른 보험료 항목과 비슷한 크기로 */
 .input-group select {
-    padding: 14px 16px;
-    font-size: 15px;
+    padding: 14px 40px 14px 16px;
+    font-size: 14px;
     font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* 스핀 버튼(화살표) 뒤에 뜨는 흰색 배경 제거 */
@@ -433,6 +446,21 @@ header {
     transform: scale(0.98);
 }
 
+/* PDF 저장 / 처음부터 다시 버튼을 한 줄에 나란히 (공간 절약용) */
+.button-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.button-row .btn-secondary {
+    width: auto;
+    flex: 1;
+    margin-top: 0;
+    padding: 12px;
+    font-size: 14px;
+}
+
 .btn-option {
     background: rgba(255, 255, 255, 0.18);
     backdrop-filter: blur(14px) saturate(160%);
@@ -520,6 +548,7 @@ header {
 .result-row {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
     padding: 14px 0;
     border-bottom: 1px solid var(--line);
     font-size: 15px;
@@ -528,11 +557,12 @@ header {
 
 /* 보험료 항목 이름 옆에 붙는 요율 표시 (예: "국민연금 4.75%") */
 .rate-tag {
+    display: block;
     font-size: 12px;
     font-weight: 500;
     color: var(--text-sub);
     opacity: 0.75;
-    margin-left: 4px;
+    margin-top: 2px;
 }
 
 .result-row.total {
@@ -666,4 +696,317 @@ footer p {
     .option-title {
         font-size: 18px;
     }
+}
+
+/* ========================================
+   PDF 저장 (브라우저 인쇄 기능 이용)
+   ======================================== */
+
+/* 화면에서는 항상 숨김 — 인쇄할 때만 보이게 함 */
+.print-only {
+    display: none;
+}
+
+@media print {
+    /* 화면용 요소는 전부 숨기고 printArea만 보여준다 */
+    body > *:not(#printArea) {
+        display: none !important;
+    }
+
+    .print-only {
+        display: block !important;
+        color: #000;
+        background: #fff;
+    }
+
+    body {
+        background: #fff;
+    }
+
+    .print-header {
+        text-align: center;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #000;
+        padding-bottom: 12px;
+    }
+
+    .print-header h2 {
+        font-size: 20px;
+        margin: 0 0 6px;
+    }
+
+    .print-header p {
+        font-size: 13px;
+        color: #333;
+        margin: 0;
+    }
+
+    .print-salary {
+        font-size: 15px;
+        margin-bottom: 14px;
+    }
+
+    .print-subheader {
+        font-size: 15px;
+        margin: 18px 0 8px;
+        padding-top: 12px;
+        border-top: 1px solid #ccc;
+    }
+
+    .print-subheader:first-of-type {
+        border-top: none;
+        padding-top: 0;
+    }
+
+    .print-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 16px;
+    }
+
+    .print-table th,
+    .print-table td {
+        border: 1px solid #999;
+        padding: 6px 7px;
+        font-size: 12px;
+        text-align: left;
+    }
+
+    .print-table td {
+        text-align: right;
+    }
+
+    .print-table .print-total th,
+    .print-table .print-total td {
+        font-weight: 700;
+        font-size: 16px;
+    }
+
+    .print-table .print-subtotal th,
+    .print-table .print-subtotal td {
+        font-weight: 700;
+        border-top: 2px solid #000;
+    }
+
+    .print-notice {
+        font-size: 13px;
+        color: #333;
+        margin: 6px 0;
+    }
+
+    .print-disclaimer {
+        font-size: 12px;
+        color: #555;
+        margin-top: 18px;
+        border-top: 1px solid #ccc;
+        padding-top: 10px;
+    }
+}
+
+/* ========================================
+   근로자 여러명 계산 (사업주 - 여러 명 한번에)
+   ======================================== */
+.multi-worker-rows {
+    margin-bottom: 12px;
+}
+
+.multi-worker-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(23, 24, 28, 0.08);
+}
+
+.multi-worker-row:first-child {
+    border-top: 1px solid rgba(23, 24, 28, 0.08);
+}
+
+.mw-row-num {
+    flex: 0 0 18px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-sub);
+    text-align: center;
+}
+
+.mw-row-inputs {
+    flex: 1;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+}
+
+.mw-row-inputs input {
+    width: 100%;
+    min-width: 0;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    border: 1.5px solid rgba(23, 24, 28, 0.15);
+    border-radius: 10px;
+    background: rgba(26, 109, 255, 0.1);
+    color: var(--text);
+}
+
+.mw-row-inputs input:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: rgba(26, 109, 255, 0.18);
+}
+
+.mw-row-inputs input::placeholder {
+    color: var(--text-sub);
+    font-weight: 500;
+    opacity: 0.6;
+    font-size: 12.5px;
+}
+
+.multi-worker-row.mw-row-error .mw-row-inputs input {
+    border-color: #e0554f;
+    background: rgba(224, 85, 79, 0.08);
+}
+
+.row-buttons {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.row-buttons .btn-row {
+    flex: 1;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    border: 1.5px solid rgba(23, 24, 28, 0.15);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.5);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.row-buttons .btn-row:active {
+    background: rgba(255, 255, 255, 0.85);
+    transform: scale(0.97);
+}
+
+/* 입력값이 잘못됐을 때 보여주는 경고 문구 (privacy-note를 빨간 톤으로 변형) */
+.input-error-note {
+    background: rgba(224, 85, 79, 0.1);
+    color: #c0392b;
+    font-weight: 600;
+}
+
+/* 사업주 결과 안의 하위 탭 (근로자 공제분 / 사업주 부담분) — 위 아코디언과 같은 방식이지만 한 단계 작게 */
+.option-block-sub {
+    margin-top: 18px;
+}
+
+.option-block-sub .btn-option {
+    padding: 16px 18px;
+}
+
+.option-block-sub .option-title {
+    font-size: 15px;
+}
+
+.option-block-sub .option-desc {
+    font-size: 12px;
+}
+
+/* 근로자 여러명 결과 — 근로자별 요약 목록 */
+.mw-result-list {
+    margin-top: 8px;
+}
+
+.mw-result-item {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.mw-result-item:last-child {
+    border-bottom: none;
+}
+
+.mw-result-item-clickable {
+    cursor: pointer;
+}
+
+.mw-result-item-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+}
+
+.mw-toggle-icon {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent-dark);
+    white-space: nowrap;
+    margin-left: 8px;
+}
+
+.mw-result-item-body {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--text-sub);
+}
+
+.mw-result-item-note {
+    font-size: 12px;
+    color: var(--accent-dark);
+    margin-top: 3px;
+}
+
+/* 근로자 줄을 탭하면 펼쳐지는 항목별 상세 내역 */
+.mw-result-detail {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.mw-result-detail.open {
+    max-height: 500px;
+}
+
+.mw-result-detail-inner {
+    padding-top: 6px;
+}
+
+.mw-result-detail .result-row {
+    padding: 10px 0;
+    font-size: 13.5px;
+}
+
+.mw-durunuri-btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.mw-durunuri-btn:active {
+    transform: scale(0.98);
+}
+
+.mw-durunuri-btn.applied {
+    background: #dbe7ff;
+    color: var(--accent-dark);
 }
