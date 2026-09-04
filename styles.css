@@ -154,6 +154,11 @@ header {
     text-align: left;
 }
 
+.privacy-note a {
+    color: var(--accent-dark);
+    font-weight: 600;
+}
+
 /* 개인정보 비저장 안내 */
 .privacy-note {
     font-size: 12.5px;
@@ -557,11 +562,17 @@ header {
 
 /* 보험료 항목 이름 옆에 붙는 요율 표시 (예: "국민연금 4.75%") */
 .rate-tag {
-    display: block;
     font-size: 12px;
     font-weight: 500;
     color: var(--text-sub);
     opacity: 0.75;
+    margin-left: 4px;
+}
+
+/* 문구가 긴 요율(예: 사업주 고용보험 합계 설명)만 줄바꿈해서 값 칸을 침범하지 않게 함 */
+.rate-tag-long {
+    display: block;
+    margin-left: 0;
     margin-top: 2px;
 }
 
@@ -707,6 +718,12 @@ footer p {
     display: none;
 }
 
+/* 표 칸이 많은(사업주 결과) PDF는 세로보다 가로가 더 여유 있어서 가로로 인쇄되게 함 */
+@page {
+    size: landscape;
+    margin: 15mm;
+}
+
 @media print {
     /* 화면용 요소는 전부 숨기고 printArea만 보여준다 */
     body > *:not(#printArea) {
@@ -786,6 +803,21 @@ footer p {
     .print-table .print-subtotal td {
         font-weight: 700;
         border-top: 2px solid #000;
+    }
+
+    .print-table .print-durunuri-row td {
+        font-style: italic;
+        color: #555;
+        background: #f5f5f5;
+        border-top: none;
+    }
+
+    .print-salary-sub {
+        display: block;
+        font-size: 10px;
+        font-weight: 400;
+        color: #666;
+        margin-top: 2px;
     }
 
     .print-notice {
@@ -869,29 +901,90 @@ footer p {
     background: rgba(224, 85, 79, 0.08);
 }
 
-.row-buttons {
+/* 근로자 명단 위 작은 헤더 줄 — 라벨과 +/- 버튼을 한 줄에 같이 배치해서 공간 절약 */
+.mw-rows-header {
     display: flex;
-    gap: 8px;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 6px;
 }
 
-.row-buttons .btn-row {
-    flex: 1;
-    padding: 10px;
-    font-size: 14px;
+.mw-rows-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-sub);
+}
+
+.mw-rows-controls {
+    display: flex;
+    gap: 6px;
+}
+
+.mw-icon-btn {
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
     font-weight: 700;
     font-family: inherit;
+    line-height: 1;
     border: 1.5px solid rgba(23, 24, 28, 0.15);
-    border-radius: 10px;
+    border-radius: 8px;
     background: rgba(255, 255, 255, 0.5);
     color: var(--text);
     cursor: pointer;
     transition: all 0.2s;
 }
 
-.row-buttons .btn-row:active {
+.mw-icon-btn:active {
     background: rgba(255, 255, 255, 0.85);
-    transform: scale(0.97);
+    transform: scale(0.92);
+}
+
+/* "사업주 본인 보험료도 함께 계산" 체크박스 + 조건부 입력칸 */
+.owner-section {
+    margin-bottom: 16px;
+}
+
+.owner-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text);
+    cursor: pointer;
+    margin-bottom: 8px;
+}
+
+.owner-toggle-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+/* 근로자 여러명 결과 안에서 "사업주 본인" 항목을 나머지 근로자 목록과 구분해주는 섹션 */
+.mw-owner-section {
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1.5px dashed var(--line);
+}
+
+.mw-owner-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent-dark);
+    margin-bottom: 4px;
+}
+
+.mw-owner-note {
+    font-size: 12px;
+    color: var(--text-sub);
+    margin-top: 8px;
 }
 
 /* 입력값이 잘못됐을 때 보여주는 경고 문구 (privacy-note를 빨간 톤으로 변형) */
@@ -941,9 +1034,14 @@ footer p {
     justify-content: space-between;
     align-items: center;
     font-size: 13.5px;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--text);
     margin-bottom: 4px;
+}
+
+.mw-result-item-salary {
+    font-weight: 400;
+    color: var(--text-sub);
 }
 
 .mw-toggle-icon {
@@ -957,8 +1055,9 @@ footer p {
 .mw-result-item-body {
     display: flex;
     justify-content: space-between;
-    font-size: 14px;
-    color: var(--text-sub);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
 }
 
 .mw-result-item-note {

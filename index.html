@@ -143,12 +143,28 @@
                 <select id="multiIndustryType"></select>
             </div>
 
-            <div id="multiWorkerRows" class="multi-worker-rows"></div>
-
-            <div class="row-buttons">
-                <button class="btn-row" onclick="removeMultiWorkerRow()">− 행삭제</button>
-                <button class="btn-row" onclick="addMultiWorkerRow()">+ 행추가</button>
+            <div class="owner-section">
+                <label class="owner-toggle-label">
+                    <input type="checkbox" id="includeOwnerCheckbox" onchange="toggleOwnerInputs()">
+                    <span>사업주 본인 보험료도 함께 계산</span>
+                </label>
+                <div id="ownerInputRow" class="multi-worker-row" style="display:none;">
+                    <div class="mw-row-inputs">
+                        <input type="text" id="ownerBirth" inputmode="numeric" placeholder="생년월 (예:199001)" maxlength="6" autocomplete="new-password">
+                        <input type="number" id="ownerSalary" inputmode="numeric" placeholder="사업주 기준급여" autocomplete="new-password">
+                    </div>
+                </div>
             </div>
+
+            <div class="mw-rows-header">
+                <span class="mw-rows-label">근로자 명단</span>
+                <div class="mw-rows-controls">
+                    <button class="mw-icon-btn" onclick="removeMultiWorkerRow()" aria-label="근로자 줄 삭제">−</button>
+                    <button class="mw-icon-btn" onclick="addMultiWorkerRow()" aria-label="근로자 줄 추가">+</button>
+                </div>
+            </div>
+
+            <div id="multiWorkerRows" class="multi-worker-rows"></div>
 
             <p id="employerInputError" class="privacy-note input-error-note" style="display:none;"></p>
 
