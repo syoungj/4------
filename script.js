@@ -862,9 +862,7 @@ function printResult(type) {
         <p class="print-disclaimer">※ 이 계산 결과는 참고용이며, 실제 신고·공제 금액은 담당 기관 확인에 따라 달라질 수 있습니다.${dd ? ' "두루누리 적용 시" 줄은 급여 270만원 이하로 두루누리 지원 가능 대상일 때 참고로 함께 보여드리는 금액이며, 실제 지원 여부는 근로복지공단 확인이 필요합니다.' : ''}</p>
     `;
 
-    // 아이폰(iOS) 사파리는 DOM을 방금 바꾼 직후 바로 print()를 부르면 미리보기가 빈 화면으로 뜨는 경우가 있어
-    // 살짝 지연을 줘서 화면이 먼저 그려지게 함
-    setTimeout(() => window.print(), 100);
+    printWithFilenameTitle(`4대보험_내월급_${salary}원_${dateSlug(today)}`);
 }
 
 // 사업주 경로(근로자 여러명) 계산 결과를 PDF로 저장 — 근로자 공제분/사업주 부담분 표를 함께 출력
@@ -1063,9 +1061,7 @@ function printEmployerAll() {
         <p class="print-disclaimer">※ 이 계산 결과는 참고용이며, 실제 신고·공제 금액은 담당 기관 확인에 따라 달라질 수 있습니다. 위 표의 요율은 기본 요율이며, 고용보험은 만 65세 이상이면 고용안정분(0.25%)만 부과됩니다.${anyExempt ? ' 나이(60세/65세) 조건으로 면제된 근로자가 있어 해당 근로자의 실제 금액은 표시된 기본 요율과 다를 수 있습니다(금액 자체는 이미 정확히 반영되어 있습니다).' : ''} 산재보험료는 선택하신 업종 기준 요율로 계산한 참고용 금액입니다. "두루누리 적용 시" 줄은 급여 270만원 이하로 두루누리 지원 가능 대상인 근로자에게 참고로 함께 보여드리는 금액이며, 실제 지원 여부는 근로복지공단 확인이 필요합니다.${ownerCalc ? ' "사업주 본인" 보험료는 국민연금·건강보험·장기요양만 계산했으며(고용보험·산재보험은 사업주 대상이 아니어서 제외), 사업주 부담 합계에는 포함되어 있고 근로자 공제 표에는 포함되지 않습니다.' : ''}</p>
     `;
 
-    // 아이폰(iOS) 사파리는 DOM을 방금 바꾼 직후 바로 print()를 부르면 미리보기가 빈 화면으로 뜨는 경우가 있어
-    // 살짝 지연을 줘서 화면이 먼저 그려지게 함
-    setTimeout(() => window.print(), 100);
+    printWithFilenameTitle(`4대보험_사업주부담_${dateSlug(today)}`);
 }
 
 // 처음부터 다시
@@ -1099,6 +1095,26 @@ function restart() {
 // 숫자 천 단위 콤마
 function formatNumber(num) {
     return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+// PDF 저장 시 파일명으로 쓰기 좋은 날짜 문자열 (예: 20260904)
+function dateSlug(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}${m}${d}`;
+}
+
+// PDF 저장(인쇄) 시 파일명 기본값으로 쓰이도록 문서 제목을 잠깐 바꿔서 인쇄 — 아이폰은 "파일에 저장" 시
+// 파일명을 직접 입력하는 칸이 없어서, 저장되는 기본 이름이라도 알아보기 쉽게 만들어주는 용도
+function printWithFilenameTitle(filenameTitle) {
+    const originalTitle = document.title;
+    document.title = filenameTitle;
+    window.addEventListener('afterprint', () => {
+        document.title = originalTitle;
+    }, { once: true });
+
+    setTimeout(() => window.print(), 100);
 }
 
 // 퍼센트 숫자를 소수점 3자리까지 깔끔하게 반올림 (0.1314*100 같은 계산에서
